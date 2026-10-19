@@ -22,6 +22,12 @@
   var Interceptor = {
     init: function () {
       $(document).on('checkout_place_order', this.onCheckoutSubmit);
+      // Fallback direct form submit listener for non-standard themes
+      $('form.checkout').on('submit', function () {
+        if (!submissionStartTime) {
+          Interceptor.onCheckoutSubmit();
+        }
+      });
       $(document).ajaxComplete(this.onAjaxComplete);
       $(document).ajaxError(this.onAjaxError);
       $(document).on('click', '.wcfg-retry-button', this.onRetryClick);
@@ -74,9 +80,12 @@
       var elapsed = Date.now() - (submissionStartTime || Date.now());
       var selectedGateway = $('input[name="payment_method"]:checked').val() || 'unknown';
 
-      // Unblock UI so user is not stuck on infinite spinner
+      // Unblock UI gracefully (checks if jquery.blockUI is loaded)
       var $form = $('form.checkout');
-      $form.removeClass('processing').unblock();
+      $form.removeClass('processing');
+      if (typeof $form.unblock === 'function') {
+        $form.unblock();
+      }
 
       // Render non-destructive failover notification
       Interceptor.renderFailoverNotice(selectedGateway, reason);
@@ -95,21 +104,24 @@
         '    <h4>' + (config.i18n.timeoutWarning || 'Payment Gateway Response Delayed') + '</h4>',
         '  </div>',
         '  <p class="wcfg-failover-desc">',
-        '    The secure gateway (' + gateway.toUpperCase() + ') is taking longer than usual to confirm your transaction. No duplicate charge has occurred.',
+        '    The payment gateway (' + gateway.toUpperCase() + ') took longer than expected to confirm your transaction. We halted the spinner to protect your order state and prevent duplicate charges.',
         '  </p>',
         '  <div class="wcfg-failover-actions">',
-        '    <button type="button" class="button alt wcfg-retry-button">' + (config.i18n.retryAction || 'Retry Order') + '</button>',
-        '    <button type="button" class="button wcfg-switch-gateway-button">' + (config.i18n.switchGateway || 'Select Another Method') + '</button>',
+        '    <button type="button" class="button alt wcfg-retry-button">' + (config.i18n.retryAction || 'Try Submitting Again') + '</button>',
+        '    <button type="button" class="button wcfg-switch-gateway-button">' + (config.i18n.switchGateway || 'Choose Another Payment Method') + '</button>',
         '  </div>',
         '</div>'
       ].join('');
 
       $('form.checkout').prepend(noticeHtml);
 
-      // Smooth scroll to top of checkout form
-      $('html, body').animate({
-        scrollTop: $('form.checkout').offset().top - 80
-      }, 400);
+      // Smooth scroll if element exists
+      var $form = $('form.checkout');
+      if ($form.length && $form.offset()) {
+        $('html, body').animate({
+          scrollTop: Math.max(0, $form.offset().top - 80)
+        }, 300);
+      }
     },
 
     clearFailoverNotice: function () {
@@ -126,7 +138,7 @@
       e.preventDefault();
       Interceptor.clearFailoverNotice();
       var $paymentSection = $('#order_review, #payment');
-      if ($paymentSection.length) {
+      if ($paymentSection.length && $paymentSection.offset()) {
         $('html, body').animate({
           scrollTop: $paymentSection.offset().top - 60
         }, 300);

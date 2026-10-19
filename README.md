@@ -24,6 +24,20 @@ When this happens:
 
 ---
 
+## 📸 Visual Previews & Operational Interface
+
+### 1. In-Store Client Interceptor (Active Circuit Breaker)
+When a gateway hangs, the infinite spinner is halted, preventing customer cart abandonment and offering instant self-recovery options:
+
+![WooCommerce Checkout Circuit Breaker Preview](docs/assets/checkout-failover-preview.png)
+
+### 2. WordPress Admin Telemetry & Health Dashboard
+Store administrators can inspect gateway latency benchmarks, view recovery rates, and fine-tune latency tripwires:
+
+![WooCommerce Checkout Guard Admin Telemetry](docs/assets/admin-telemetry-preview.png)
+
+---
+
 ## 🛠️ Key Architectural Features
 
 - **Asynchronous Client Circuit Breaker**: Disarms infinite checkout spinners and gracefully restores form interactivity on timeout.
@@ -46,6 +60,8 @@ woo-checkout-failover-guard/
 │   │   └── checkout-guard.css   <-- Failover alert styling & animations
 │   └── js/
 │       └── checkout-interceptor.js <-- Client-side circuit breaker listener
+├── docs/
+│   └── assets/                  <-- High-resolution architecture & UI previews
 ├── includes/
 │   ├── class-admin.php          <-- WP Admin dashboard & settings controller
 │   ├── class-guard.php          <-- Core timeout handler & HPOS metadata
@@ -53,10 +69,25 @@ woo-checkout-failover-guard/
 │   └── class-telemetry.php      <-- Latency metrics & log pruner
 ├── templates/
 │   └── admin-dashboard.php      <-- Telemetry UI table & settings form
+├── tests/
+│   ├── run-e2e-test.js          <-- Headless Chromium E2E verification suite
+│   ├── checkout-simulation.html <-- Checkout lifecycle DOM mock
+│   └── admin-simulation.html    <-- Admin dashboard mock
 ├── composer.json                <-- PSR-4 autoload mapping
 ├── LICENSE                      <-- GPL-3.0 License
-├── README.md                    <-- Technical documentation
+├── README.md                    <-- Technical documentation with screenshots
 └── woo-checkout-failover-guard.php <-- Main plugin entry point & metadata
+```
+
+---
+
+## 🧪 Automated Testing & Verification
+
+The repository includes an end-to-end headless browser test suite verifying the circuit breaker trigger and UI unblocking:
+
+```bash
+# Run Playwright E2E simulation suite
+node tests/run-e2e-test.js
 ```
 
 ---

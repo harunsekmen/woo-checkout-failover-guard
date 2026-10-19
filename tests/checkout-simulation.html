@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WooCommerce Checkout Demo - Store Checkout</title>
+  <link rel="stylesheet" href="../assets/css/checkout-guard.css">
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: #f6f7f9;
+      margin: 0;
+      padding: 40px 20px;
+      color: #1e293b;
+    }
+    .checkout-container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+    }
+    .store-header {
+      background: #1e1e2d;
+      color: #ffffff;
+      padding: 20px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .store-title {
+      font-size: 20px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .store-badge {
+      font-size: 11px;
+      background: #7f54b3;
+      padding: 4px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    .checkout-body {
+      padding: 32px;
+    }
+    .order-summary {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      font-size: 14px;
+      border-bottom: 1px dashed #e2e8f0;
+    }
+    .summary-row:last-child {
+      border-bottom: none;
+      font-weight: 700;
+      font-size: 16px;
+      padding-top: 12px;
+    }
+    .payment-methods {
+      margin-top: 24px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 16px;
+      background: #ffffff;
+    }
+    .payment-option {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .payment-option.active {
+      background: #f1f5f9;
+    }
+    .place-order-btn {
+      width: 100%;
+      background: #7f54b3;
+      color: #ffffff;
+      border: none;
+      padding: 16px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 24px;
+      transition: background 0.2s;
+    }
+    .place-order-btn:hover {
+      background: #693e99;
+    }
+  </style>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    window.wcfgConfig = {
+      ajaxUrl: '/wp-admin/admin-ajax.php',
+      nonce: 'wcfg_test_nonce_123',
+      timeoutThreshold: 1200, // Quick timeout for testing/rendering
+      fallbackGateways: ['bacs', 'cod'],
+      i18n: {
+        timeoutWarning: 'Payment Gateway Response Delayed (504 Circuit Breaker)',
+        retryAction: 'Try Submitting Again',
+        switchGateway: 'Choose Another Payment Method',
+        verifyingStatus: 'Verifying order status with payment provider...',
+        orderRecovered: 'Payment confirmed! Redirecting to receipt...'
+      }
+    };
+  </script>
+  <script src="../assets/js/checkout-interceptor.js"></script>
+</head>
+<body>
+  <div class="checkout-container">
+    <div class="store-header">
+      <div class="store-title">
+        <span>Nordic Wool &amp; Apparel</span>
+        <span class="store-badge">WooCommerce HPOS</span>
+      </div>
+      <div style="font-size: 13px; color: #94a3b8;">Secure Checkout 256-bit SSL</div>
+    </div>
+    <div class="checkout-body">
+      <form class="checkout" name="checkout" method="post">
+        <!-- Guard notification renders here dynamically -->
+
+        <div class="order-summary">
+          <h3 style="margin-top: 0; font-size: 16px;">Order Summary #84920</h3>
+          <div class="summary-row">
+            <span>Handmade Merino Wool Sweater × 1</span>
+            <span>$149.00</span>
+          </div>
+          <div class="summary-row">
+            <span>Express Courier Shipping</span>
+            <span>$12.00</span>
+          </div>
+          <div class="summary-row">
+            <span>Total</span>
+            <span style="color: #7f54b3;">$161.00</span>
+          </div>
+        </div>
+
+        <div class="payment-methods" id="payment">
+          <h3 style="margin-top: 0; font-size: 16px;">Select Payment Gateway</h3>
+          <label class="payment-option active">
+            <input type="radio" name="payment_method" value="stripe" checked>
+            <strong>Credit Card (Stripe Gateway)</strong>
+            <span style="margin-left: auto; font-size: 12px; color: #64748b;">Visa, MC, Amex</span>
+          </label>
+          <label class="payment-option">
+            <input type="radio" name="payment_method" value="paypal">
+            <strong>PayPal Express Checkout</strong>
+          </label>
+          <label class="payment-option">
+            <input type="radio" name="payment_method" value="bacs">
+            <strong>Direct Bank Transfer (BACS)</strong>
+          </label>
+        </div>
+
+        <button type="submit" class="place-order-btn" id="place_order">
+          Confirm and Pay $161.00
+        </button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>
+
