@@ -1,0 +1,32 @@
+name: CI Code Quality & HPOS Compatibility
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  lint:
+    name: PHP Lint & Syntax Validation
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-version: ['8.1', '8.2', '8.3']
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: mbstring, intl, json
+
+      - name: Validate Composer Configuration
+        run: composer validate --strict
+
+      - name: PHP Syntax Check (Lint)
+        run: find . -name "*.php" -not -path "./vendor/*" -exec php -l {} \;
+

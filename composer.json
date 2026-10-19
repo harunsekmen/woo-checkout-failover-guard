@@ -1,0 +1,25 @@
+{
+  "name": "harunsekmen/woo-checkout-failover-guard",
+  "description": "Enterprise-grade checkout failover and timeout circuit breaker for WooCommerce and payment gateways.",
+  "type": "wordpress-plugin",
+  "license": "GPL-3.0-or-later",
+  "authors": [
+    {
+      "name": "Harun Sekmen",
+      "homepage": "https://github.com/harunsekmen"
+    }
+  ],
+  "require": {
+    "php": ">=8.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "WooCheckoutFailoverGuard\\": "includes/"
+    }
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "sort-packages": true
+  }
+}
+
