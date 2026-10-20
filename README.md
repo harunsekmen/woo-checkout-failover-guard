@@ -39,6 +39,38 @@ During traffic surges, flash sales, or temporary payment gateway processing dela
 
 ---
 
+
+---
+
+## 🏗️ Architecture & Request Flow
+
+The following sequence illustrates how the asynchronous circuit breaker intercepts latency spikes before duplicate authorizations occur:
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Customer as Shopper
+    participant Browser as Client (Checkout JS)
+    participant WC as WooCommerce (Server)
+    participant Gateway as Payment Gateway (Stripe/POS)
+
+    Customer->>Browser: Clicks "Place Order"
+    Browser->>Browser: Arm Circuit Breaker (Timeout Tripwire)
+    Browser->>WC: POST /?wc-ajax=checkout
+    WC->>Gateway: Process Payment API Request
+
+    alt Gateway Responds Within Window (Happy Path)
+        Gateway-->>WC: 200 OK (Authorized)
+        WC-->>Browser: Redirect to /order-received/
+        Browser->>Browser: Disarm Circuit Breaker
+    else Gateway Latency Exceeds Threshold (Timeout Event)
+        Browser->>Browser: Tripwire Fires (Abort Hang)
+        Browser->>Customer: Unblock Overlay + Show Safe Recovery Prompt
+        Note over Browser,Customer: Preserves form data & prevents duplicate charge
+        Customer->>Browser: Retry or Choose Alternate Gateway
+    end
+```
+
 ## 🛠️ Key Architectural Features
 
 - **Asynchronous Timeout Interceptor:** Disarms frozen loading overlays and restores checkout form interactivity when a gateway fails to respond in time.
